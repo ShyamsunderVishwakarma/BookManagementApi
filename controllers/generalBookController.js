@@ -6,46 +6,25 @@ var BookDetail = require('../models/bookDetail');
 //included jsonwebtoken library
 var jwt =require('jsonwebtoken');
 
+//included paswword hashing  library
+var passwordHash = require('password-hash');
+
 //included configuration file
 var config = require('../config/configuration');
 
 //middleware to authenticate Token
-exports.authenticateToken = function(req,res,next){
 
-	console.log("auth Token token-key : "+ req.headers['token-key']);
-
-	var token = req.body.token || req.headers['token-key'];
-
-	if(token)
-	{
-		jwt.verify(token,config.tokenconfig.secret,function(err,decodedToken){
-
-			if(err)
-			{
-				res.send({message : "invalid token !!!",msgtype : "E"});
-			}
-			else
-			{
-				console.log("token matched!!!");
-				next();
-			}
-
-		});
-	}
-	else
-	{
-		res.send({message : "invalid user!!!",msgtype : "E"});
-	}
-}
 
 //To create user
 exports.createUser = function(req,res){
 	
+	var hashedPassword = passwordHash.generate(req.body.password);
+
 	var userdetail = new UserDetail({
 		firstname: req.body.firstname,
 		lastname: req.body.lastname,
 		emailid: req.body.emailid,
-		password: req.body.password
+		password: hashedPassword
 	});
 
 	userdetail.save(function(err,data){
@@ -55,18 +34,20 @@ exports.createUser = function(req,res){
 		if(err)
 		{
 			console.log("Create User Error: " + err);
-			res.send({"message" : err,"msgTye" : "E"})
+			res.send({"message" : err,"msgTye" : "E",StatusCode:"502"})
 		}
 		else
 		{
 			console.log("User Created Successfully!!!");
-			res.send({message : "User Created Successfully!!!",msgTye : "S"});
+			res.send({message : "User Created Successfully!!!",msgTye : "S",StatusCode:"200"});
 		}
 	});
 }
 
 //To Login user and get Access Token
 exports.login = function(req,res){
+
+	console.log("email id : " + req.body.emailid);
 
 	UserDetail.findOne({
 		emailid : req.body.emailid
@@ -76,19 +57,19 @@ exports.login = function(req,res){
 
 		if(!data)
 		{
-			res.send({message:"No such user Exsist!",msgtype:"E"});
+			res.send({message:"No such user Exsist!",msgtype:"E",StatusCode:"502"});
 		}
 		else
 		{
-			if(data.password != req.body.password)
+			if( ! passwordHash.verify(req.body.password, data.password))
 			{
-				res.send({message : "No such password exists!",msgtye : "E"});
+				res.send({message : "No such password exists!",msgtye : "E",StatusCode:"200"});
 			}
 			else
 			{
 				var token = jwt.sign(data,config.tokenconfig.secret,{expiresIn: '1h'});
 
-				res.send({message:"Token generated successfully!!!",msgtye : "S",tokenkey:token});
+				res.send({message:"Token generated successfully!!!",msgtye : "S",tokenkey:token,StatusCode:"200"});
 			}
 		}
 
@@ -121,12 +102,12 @@ exports.createBook = function(req,res){
 					if(err)	
 					{
 						console.log("Added Book Error: " + err);
-						res.send({"message" : err,"msgTye" : "E"})
+						res.send({"message" : err,"msgTye" : "E",StatusCode:"502"})
 					}
 					else
 					{
 						console.log("Book Added Successfully!!!");
-						res.send({message : "Book Added Successfully!!!",msgTye : "S"});
+						res.send({message : "Book Added Successfully!!!",msgTye : "S",StatusCode:"201"});
 					}
 				});
 			}
@@ -134,7 +115,7 @@ exports.createBook = function(req,res){
 			{
 				//Bookid already exsist in db 
 				console.log("BookId already exsist!!!");
-				res.send({message : "BookId already exsist!!!",msgTye : "S"});
+				res.send({message : "BookId already exsist!!!",msgTye : "S",StatusCode:"200"});
 			}
 
 		});
@@ -147,17 +128,17 @@ exports.getAllBook = function(req,res){
 
 		if(err)
 		{
-			res.send({message:"Oops something went wrong!!!",msgTye : "E"});
+			res.send({message:"Oops something went wrong!!!",msgTye : "E",StatusCode:"502"});
 		}
 		else
 		{
 			if(data.length == 0)
 			{
-				res.send({message : "No data available!!!",msgtype : "S",Data:data});
+				res.send({message : "No data available!!!",msgtype : "S",Data:data,StatusCode:"200"});
 			}
 			else
 			{
-				res.send({message : "Data retrive successfully !!!",msgtype : "S",Data:data});
+				res.send({message : "Data retrive successfully !!!",msgtype : "S",Data:data,StatusCode:"200"});
 			}
 		}
 	});
@@ -166,23 +147,23 @@ exports.getAllBook = function(req,res){
 //get book by bookid
 exports.getBookById = function(req,res){
 
-	var _bookid = req.body.bookid;
+	var _bookid = req.params.bookid;
 
 	BookDetail.find({bookid : _bookid},function(err,data){
 
 		if(err)
 		{
-			res.send({message:"Oops something went wrong!!!",msgTye : "E"});
+			res.send({message:"Oops something went wrong!!!",msgTye : "E",StatusCode:"502"});
 		}
 		else
 		{
 			if(data.length == 0)
 			{
-				res.send({message : "No data available!!!",msgtype : "S",Data:data});
+				res.send({message : "No data available!!!",msgtype : "S",Data:data,StatusCode:"200"});
 			}
 			else
 			{
-				res.send({message : "Data retrive successfully !!!",msgtype : "S",Data:data});
+				res.send({message : "Data retrive successfully !!!",msgtype : "S",Data:data,StatusCode:"200"});
 			}
 		}
 	});
@@ -196,16 +177,16 @@ exports.deleteByBookId = function(req,res){
 
 		if(err)
 		{
-			res.send({message:"Oops something went wrong!!!",msgTye : "E"});
+			res.send({message:"Oops something went wrong!!!",msgTye : "E",StatusCode:"502"});
 		}
 
 		if(result.ok == 1)
 		{
-			res.send({message : "Data deleted successfully!!!",msgtype : "S",Data:result});
+			res.send({message : "Data deleted successfully!!!",msgtype : "S",Data:result,StatusCode:"200"});
 		}
 		else
 		{
-			res.send({message : "No Data found provided bookid!!!",msgtype : "S",Data:result});	
+			res.send({message : "No Data found provided bookid!!!",msgtype : "S",Data:result,StatusCode:"200"});	
 		}
 	});	
 }
@@ -218,7 +199,7 @@ exports.updateBookByBookId = function(req,res){
 	var _description = req.body.description;
 	var _ifsc = req.body.ifsc;
 
-	var selectionObject = {bookid : _bookid};
+	var selectionObject = {bookid : req.params.bookid};
 	var projectionObject = {title : _title, description:_description, ifsc:_ifsc}
 
 	BookDetail.updateOne(selectionObject,projectionObject,function(err,result){
@@ -227,17 +208,17 @@ exports.updateBookByBookId = function(req,res){
 
 		if(err)
 		{
-			res.send({message:"Oops something went wrong!!!",msgTye : "E"});
+			res.send({message:"Oops something went wrong!!!",msgTye : "E",StatusCode:"502"});
 		}
 		else
 		{
 			if(result.n == 1)
 			{
-				res.send({message : "Data retrive successfully !!!",msgtype : "S",Data:result});
+				res.send({message : "Data updated successfully !!!",msgtype : "S",Data:result,StatusCode:"200"});
 			}
 			else
 			{
-				res.send({message : "No data available!!!",msgtype : "S",Data:result});
+				res.send({message : "No data available!!!",msgtype : "S",Data:result,StatusCode:"200"});
 			}
 		}
 	});

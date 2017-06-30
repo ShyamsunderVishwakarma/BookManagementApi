@@ -6,4 +6,5 @@ module.exports = {
 	tokenconfig :{
 		'secret':'mytokensecret'
 	}
+	
 };	

@@ -5,18 +5,18 @@ var router = express.Router();
 //included generalcontroller files
 var genBookController = require('../controllers/generalBookController');
 
+//include middleware file
+var isAuthenticate = require('../middlewares/generalMiddleware');
+
 //request process without token validation
-router.post('/createuser', genBookController.createUser);
+router.post('/user', genBookController.createUser);
 router.post('/login',genBookController.login);
 
-//Authenticate token before below request
-router.use('/*',genBookController.authenticateToken);
-
 //request process with token validation
-router.get('/getallbook',genBookController.getAllBook);
-router.post('/createbook',genBookController.createBook);
-router.post('/getbookbyid',genBookController.getBookById);
-router.delete('/deletebybookid/:bookid',genBookController.deleteByBookId);
-router.post('/updatebookbybookid',genBookController.updateBookByBookId);
+router.get('/book',isAuthenticate.authenticateToken,genBookController.getAllBook);
+router.post('/book',isAuthenticate.authenticateToken,genBookController.createBook);
+router.get('/book/:bookid',isAuthenticate.authenticateToken,genBookController.getBookById);
+router.delete('/book/:bookid',isAuthenticate.authenticateToken,genBookController.deleteByBookId);
+router.put('/book/:bookid',isAuthenticate.authenticateToken,genBookController.updateBookByBookId);
 
 module.exports = router;
