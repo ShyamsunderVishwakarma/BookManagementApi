@@ -9,6 +9,12 @@ var jwt =require('jsonwebtoken');
 //included paswword hashing  library
 var passwordHash = require('password-hash');
 
+//include check type for validating value
+var check = require('check-types');
+
+//include email validator library
+var emailCheck = require("email-validator");
+
 //included configuration file
 var config = require('../config/configuration');
 
@@ -18,6 +24,20 @@ var config = require('../config/configuration');
 //To create user
 exports.createUser = function(req,res){
 	
+	if(check.null(req.body.firstname) || check.undefined(req.body.firstname) ||check.emptyString(req.body.firstname))
+	{
+		res.send({"message" : "Proper firstname required","msgTye" : "E",StatusCode:"200"})
+	}
+	elseif ((check.null(req.body.emailid)) || (check.undefined(req.body.emailid)) 
+		|| (check.emptyString(req.body.emailid)) || !(emailCheck.validate(req.body.emailid)))
+	{
+		res.send({"message" : "Proper emailid required","msgTye" : "E",StatusCode:"200"})
+	}
+	elseif(check.null(req.body.password) || check.undefined(req.body.password) ||check.emptyString(req.body.password))
+	{
+		res.send({"message" : "Proper password required","msgTye" : "E",StatusCode:"200"})
+	}
+
 	var hashedPassword = passwordHash.generate(req.body.password);
 
 	var userdetail = new UserDetail({
@@ -34,7 +54,7 @@ exports.createUser = function(req,res){
 		if(err)
 		{
 			console.log("Create User Error: " + err);
-			res.send({"message" : err,"msgTye" : "E",StatusCode:"502"})
+			res.send({"message" : err,"msgTye" : "E",StatusCode:"502"});
 		}
 		else
 		{
