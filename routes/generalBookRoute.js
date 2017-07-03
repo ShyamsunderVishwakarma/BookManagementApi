@@ -15,8 +15,8 @@ router.post('/login',genBookController.login);
 //request process with token validation
 router.get('/book',isAuthenticate.authenticateToken,genBookController.getAllBook);
 router.post('/book',isAuthenticate.authenticateToken,genBookController.createBook);
-router.get('/book/:bookid',isAuthenticate.authenticateToken,genBookController.getBookById);
-router.delete('/book/:bookid',isAuthenticate.authenticateToken,genBookController.deleteByBookId);
-router.put('/book/:bookid',isAuthenticate.authenticateToken,genBookController.updateBookByBookId);
+router.get('/book/:isbn',isAuthenticate.authenticateToken,genBookController.getBookById);
+router.delete('/book/:isbn',isAuthenticate.authenticateToken,genBookController.deleteByBookId);
+router.put('/book/:isbn',isAuthenticate.authenticateToken,genBookController.updateBookByBookId);
 
 module.exports = router;

@@ -2,11 +2,9 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var bookDetailSchema = new Schema({
-
-	bookid: { type:Number,require:true,unique:true},
-	title: { type:String,require : true},
+	title: { type:String,required : true},
 	description: { type:String},
-	ifsc: { type:String,require:true}
+	isbn: { type:String,required:true,unique:true}
 });
 
 var BookDetail = mongoose.model('BookDetail',bookDetailSchema,'bookdetail');

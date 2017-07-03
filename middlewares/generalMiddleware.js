@@ -17,7 +17,7 @@ exports.authenticateToken = function(req,res,next){
 
 			if(err)
 			{
-				res.send({message : "invalid token !!!",msgtype : "E"});
+				res.send({message : "invalid token !!!",msgtype : "E"}).status(401);
 			}
 			else
 			{
@@ -29,6 +29,6 @@ exports.authenticateToken = function(req,res,next){
 	}
 	else
 	{
-		res.send({message : "invalid user!!!",msgtype : "E"});
+		res.send({message : "invalid user!!!",msgtype : "E"}).status(401);
 	}
 }
