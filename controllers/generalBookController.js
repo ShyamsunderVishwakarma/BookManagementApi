@@ -24,16 +24,20 @@ var config = require('../config/configuration');
 //To create user
 exports.createUser = function(req,res){
 	
-	if(check.null(req.body.firstname) || check.undefined(req.body.firstname) ||check.emptyString(req.body.firstname))
+	var _firstname = req.body.firstname;
+	var _emailid = req.body.emailid;
+	var _password = req.body.password;
+
+	if(check.null(_firstname) || check.undefined(_firstname) ||check.emptyString(_firstname))
 	{
 		res.send({"message" : "Proper firstname required","msgTye" : "E",StatusCode:"200"})
 	}
-	elseif ((check.null(req.body.emailid)) || (check.undefined(req.body.emailid)) 
-		|| (check.emptyString(req.body.emailid)) || !(emailCheck.validate(req.body.emailid)))
+	elseif ((check.null(_emailid)) || (check.undefined(_emailid)) 
+		|| (check.emptyString(_emailid)) || !(emailCheck.validate(_emailid)))
 	{
 		res.send({"message" : "Proper emailid required","msgTye" : "E",StatusCode:"200"})
 	}
-	elseif(check.null(req.body.password) || check.undefined(req.body.password) ||check.emptyString(req.body.password))
+	elseif(check.null(_password) || check.undefined(_password) ||check.emptyString(_password))
 	{
 		res.send({"message" : "Proper password required","msgTye" : "E",StatusCode:"200"})
 	}
@@ -99,6 +103,28 @@ exports.login = function(req,res){
 //Add new book entry
 exports.createBook = function(req,res){
 	
+	var _bookid = req.body.bookid;
+	var _title = req.body.title;
+	var _description = req.body.description;
+	var _ifsc = req.body.ifsc;
+
+	if(check.null(_bookid) || check.undefined(_bookid) ||check.emptyString(_bookid))
+	{
+		res.send({"message" : "Bookid required","msgTye" : "E",StatusCode:"200"})
+	}
+	elseif(check.null(_title) || check.undefined(_title) ||check.emptyString(_title))
+	{
+		res.send({"message" : "Book title required","msgTye" : "E",StatusCode:"200"})
+	}
+	elseif(check.null(_description) || check.undefined(_description) ||check.emptyString(_description))
+	{
+		res.send({"message" : "Book description required","msgTye" : "E",StatusCode:"200"})
+	}
+	elseif(check.null(_ifsc) || check.undefined(_ifsc) ||check.emptyString(_ifsc))
+	{
+		res.send({"message" : "Book ifsc required","msgTye" : "E",StatusCode:"200"})	
+	}
+
 	var bookdetail = new BookDetail({
 		bookid: req.body.bookid,
 		title: req.body.title,
