@@ -204,6 +204,7 @@ exports.getBookById = function(req,res){
 exports.deleteByBookId = function(req,res){
 
 	var _isbn = req.params.isbn;
+
 	BookDetail.remove({isbn : _isbn},function(err,result){
 
 		if(err)
@@ -211,13 +212,15 @@ exports.deleteByBookId = function(req,res){
 			return res.send({message:"Oops something went wrong!!!",msgTye : "E"}).status(500);
 		}
 
-		if(result.ok == 1)
+		var resultData = JSON.parse(result);
+
+		if(resultData.n)
 		{
 			return res.send({message : "Data deleted successfully!!!",msgtype : "S",Data:result}).status(200);
 		}
 		else
 		{
-			return res.send({message : "No Data found provided bookid!!!",msgtype : "S",Data:result}).status(200);	
+			return res.send({message : "No Data found for provided isbn!!!",msgtype : "S",Data:result}).status(400);	
 		}
 	});	
 }
@@ -227,14 +230,12 @@ exports.updateBookByBookId = function(req,res){
 
 	var _title = req.body.title;
 	var _description = req.body.description;
-	var _ifsc = req.body.ifsc;
+	var _isbn = req.body.isbn;
 
 	var selectionObject = {isbn : req.params.isbn};
-	var projectionObject = {title : _title, description:_description}
+	var projectionObject = {title : _title, description:_description,isbn:_isbn}
 
 	BookDetail.updateOne(selectionObject,projectionObject,function(err,result){
-
-		console.log("result : " + result);
 
 		if(err)
 		{
@@ -248,7 +249,7 @@ exports.updateBookByBookId = function(req,res){
 			}
 			else
 			{
-				return res.send({message : "No data available!!!",msgtype : "S",Data:result}).status(200);
+				return res.send({message : "No data available!!!",msgtype : "S",Data:result}).status(400);
 			}
 		}
 	});
